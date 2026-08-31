@@ -699,3 +699,125 @@
   html[data-theme="dark"] .modern-chart-card{background:linear-gradient(145deg,#153846,#12303d);border-color:var(--line)}html[data-theme="dark"] .modern-visuals-section{background:#12303d;border-color:var(--line)}
   @media(max-width:760px){.modern-visuals-body{padding:16px}.modern-chart-grid{grid-template-columns:1fr}.modern-chart-card.wide{grid-column:auto}.modern-chart-canvas{height:250px}.modern-chart-canvas.donut-canvas{height:270px}.modern-chart-canvas.radar-canvas{height:290px}.modern-chart-canvas.governor-canvas{height:300px}}
   @media(max-width:480px){.modern-visuals-head{padding:17px 16px}.modern-visuals-head h2{font-size:17px}.modern-visuals-body{padding:12px}.modern-chart-card{padding:12px}.modern-chart-title h3{font-size:14px}.modern-chart-canvas{height:220px}.modern-chart-canvas.donut-canvas{height:240px}.modern-chart-canvas.radar-canvas{height:250px}.modern-chart-canvas.governor-canvas{height:270px}}
+
+/* ═══════════════════════════════════════
+   MAP MARKERS & GOVERNORATE PROFILE
+   ═══════════════════════════════════════ */
+
+/* Custom map markers */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+.custom-marker div {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.custom-marker div:hover {
+  transform: scale(1.25);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+}
+
+/* Governorate Profile Overlay */
+.gov-profile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 42, 58, 0.6);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.gov-profile-overlay.open {
+  display: flex;
+}
+.gov-profile-box {
+  background: var(--paper);
+  border-radius: 20px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 80px rgba(5, 42, 58, 0.35);
+  border: 2px solid #0D8BA8;
+}
+.gov-profile-head {
+  padding: 22px 26px;
+  border-bottom: 2px solid var(--sand-2);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #0B5A7A, #052a3a);
+  color: white;
+  border-radius: 18px 18px 0 0;
+}
+.gov-profile-head h3 {
+  margin: 0;
+  font-family: 'Tajawal';
+  font-weight: 900;
+  font-size: 20px;
+}
+.gov-profile-head .close-btn {
+  margin-inline-start: auto;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.15s;
+}
+.gov-profile-head .close-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+.gov-profile-body {
+  padding: 24px 26px;
+}
+.profile-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.profile-kpi {
+  background: var(--sand);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.profile-kpi .pk-val {
+  font-family: 'IBM Plex Mono';
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--ink);
+}
+.profile-kpi .pk-lbl {
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+.profile-section-title {
+  font-family: 'Tajawal';
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+  margin: 20px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--sand-2);
+}
+.profile-text-block {
+  background: var(--sand);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--ink-soft);
+}
