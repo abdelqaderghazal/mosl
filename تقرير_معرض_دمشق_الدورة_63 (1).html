@@ -244,6 +244,7 @@
   }
   .footer strong { color: var(--teal); }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -252,9 +253,46 @@
   <div class="hero-top">
     <div>
       <h1>📊 تقرير رأي الزوار – معرض دمشق الدولي</h1>
-      <div class="hero-sub">الدورة 63 &nbsp;·&nbsp; استبيان شارك فيه 300 مواطن من مختلف الفئات &nbsp;·&nbsp; وزارة الشؤون الاجتماعية والعمل</div>
+      <div class="hero-sub" style="font-weight:600;color:rgba(255,255,255,.75)">وزارة الشؤون الاجتماعية والعمل &nbsp;·&nbsp; مديرية التخطيط والإحصاء</div>
+      <div class="hero-sub">الدورة 63 &nbsp;·&nbsp; استبيان شارك فيه 300 مواطن من مختلف الفئات &nbsp;·&nbsp;</div>
     </div>
-    <div class="hero-badge">🗓 الدورة 63</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="export-btn" onclick="exportToImage()" style="
+        background:var(--teal);
+        color:#0A1628;
+        border:none;
+        padding:9px 20px;
+        border-radius:99px;
+        font-family:'Cairo',sans-serif;
+        font-size:13px;
+        font-weight:700;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        gap:6px;
+        box-shadow:0 3px 10px rgba(0,201,167,.4);
+        transition:transform .15s, box-shadow .15s;
+      " onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 5px 14px rgba(0,201,167,.55)'"
+         onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 3px 10px rgba(0,201,167,.4)'">🖼️ تصدير كصورة</button>
+      <button class="export-btn" id="exportWordBtn" onclick="exportToWord()" style="
+        background:var(--gold);
+        color:#0A1628;
+        border:none;
+        padding:9px 20px;
+        border-radius:99px;
+        font-family:'Cairo',sans-serif;
+        font-size:13px;
+        font-weight:700;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        gap:6px;
+        box-shadow:0 3px 10px rgba(247,183,49,.4);
+        transition:transform .15s, box-shadow .15s;
+      " onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 5px 14px rgba(247,183,49,.55)'"
+         onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 3px 10px rgba(247,183,49,.4)'">📄 تصدير إلى Word</button>
+      <div class="hero-badge">🗓 الدورة 63</div>
+    </div>
   </div>
   <div class="kpi-strip">
     <div class="kpi-card teal">
@@ -518,7 +556,7 @@
 
 <!-- FOOTER -->
 <div class="footer">
-  صوت المواطن أمانة في أعناقنا &nbsp;·&nbsp; هذا التقرير خارطة طريق نحو وزارة أكثر فاعلية وأقرب إلى المواطن &nbsp;·&nbsp; <strong>معرض دمشق الدولي – الدورة 63</strong>
+  صوت المواطن أمانة في أعناقنا &nbsp;·&nbsp; هذا التقرير خارطة طريق نحو وزارة أكثر فاعلية وأقرب إلى المواطن &nbsp;·&nbsp; <strong>معرض دمشق الدولي – الدورة 63</strong> &nbsp;·&nbsp; إعداد: مديرية التخطيط والإحصاء
 </div>
 
 <script>
@@ -603,5 +641,85 @@ new Chart(commsCtx, {
 });
 </script>
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+async function exportToImage() {
+  const btn = event.target.closest('button');
+  const original = btn.innerHTML;
+  btn.innerHTML = '⏳ جارٍ التصدير...';
+  btn.disabled = true;
+  try {
+    // Hide export buttons so they don't appear in the image
+    document.querySelectorAll('.export-btn').forEach(b => b.style.display = 'none');
+    await new Promise(r => setTimeout(r, 50));
+
+    const target = document.querySelector('body');
+    const canvas = await html2canvas(target, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#F0F4FF',
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight
+    });
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'تقرير_رأي_الزوار_معرض_دمشق_الدورة_63.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } finally {
+    document.querySelectorAll('.export-btn').forEach(b => b.style.display = '');
+    btn.innerHTML = original;
+    btn.disabled = false;
+  }
+}
+function exportToWord() {
+  // Replace each canvas with its rendered image so charts appear in Word
+  document.querySelectorAll('canvas').forEach(c => {
+    try {
+      const img = document.createElement('img');
+      img.src = c.toDataURL('image/png');
+      img.style.width = '100%';
+      img.style.maxWidth = '100%';
+      c.parentNode.insertBefore(img, c);
+      c.style.display = 'none';
+    } catch(e) {}
+  });
+
+  // Hide export buttons so they don't appear in the exported file
+  document.querySelectorAll('.export-btn').forEach(b => b.style.display = 'none');
+
+  const content = document.documentElement.outerHTML;
+
+  // Restore buttons
+  document.querySelectorAll('.export-btn').forEach(b => b.style.display = '');
+  document.querySelectorAll('canvas').forEach(c => c.style.display = '');
+
+  const header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    + 'xmlns:w="urn:schemas-microsoft-com:office:word" '
+    + 'xmlns="http://www.w3.org/TR/REC-html40">'
+    + '<head><meta charset="utf-8"><title>تقرير رأي الزوار</title>'
+    + '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View>'
+    + '<w:Zoom>90</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->'
+    + '<style>'
+    + 'body{font-family:"Cairo",Tahoma,Arial,sans-serif;direction:rtl;text-align:right;}'
+    + '@page{size:A4;margin:1.5cm;}'
+    + '</style></head><body>';
+  const footer = '</body></html>';
+
+  const blob = new Blob(['\ufeff' + header + content + footer],
+    { type: 'application/msword' });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'تقرير_رأي_الزوار_معرض_دمشق_الدورة_63.doc';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
 </body>
 </html>
