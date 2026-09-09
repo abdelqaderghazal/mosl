@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير رأي الزوار – معرض دمشق الدولي الدورة 63</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0A1628;
+    --teal: #00C9A7;
+    --gold: #F7B731;
+    --rose: #FC5C7D;
+    --blue: #1E88E5;
+    --light: #F0F4FF;
+    --mid: #E2EAF8;
+    --text: #1A2340;
+    --muted: #6B7A99;
+  }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--light);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0A1628 0%, #112240 50%, #0D2E5C 100%);
+    padding: 28px 36px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(0,201,167,.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; right: 60px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(247,183,49,.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .hero-badge {
+    background: rgba(0,201,167,.15);
+    border: 1px solid rgba(0,201,167,.4);
+    color: var(--teal);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .hero h1 {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.3;
+  }
+  .hero-sub {
+    color: rgba(255,255,255,.55);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .kpi-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 14px;
+    padding: 14px 16px;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    transition: transform .2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); }
+  .kpi-icon { font-size: 22px; margin-bottom: 4px; }
+  .kpi-num {
+    font-size: 26px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+  .kpi-num span { font-size: 14px; opacity: .7; }
+  .kpi-label { color: rgba(255,255,255,.55); font-size: 11px; margin-top: 4px; }
+  .kpi-card.teal .kpi-num { color: var(--teal); }
+  .kpi-card.gold .kpi-num { color: var(--gold); }
+  .kpi-card.rose .kpi-num { color: var(--rose); }
+  .kpi-card.blue .kpi-num { color: #74B3FA; }
+
+  /* ── BODY ── */
+  .body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 14px;
+    padding: 16px 18px;
+  }
+
+  .panel {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 12px rgba(10,22,40,.07);
+  }
+  .panel-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .panel-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* spans */
+  .span2 { grid-column: span 2; }
+  .span3 { grid-column: span 3; }
+  .span1 { grid-column: span 1; }
+
+  /* ── PRIORITY BARS ── */
+  .priority-list { display: flex; flex-direction: column; gap: 9px; }
+  .priority-item { display: flex; flex-direction: column; gap: 3px; }
+  .priority-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+  .priority-label { color: var(--text); font-weight: 600; }
+  .priority-pct { font-weight: 700; font-size: 13px; }
+  .bar-track {
+    height: 8px;
+    background: var(--mid);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 1s ease;
+  }
+
+  /* ── KPI TABLE ── */
+  .kpi-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  .kpi-table thead th {
+    color: var(--muted);
+    font-weight: 600;
+    text-align: right;
+    padding: 4px 6px 8px;
+    border-bottom: 2px solid var(--mid);
+    font-size: 11px;
+  }
+  .kpi-table tbody tr:not(:last-child) td { border-bottom: 1px solid var(--mid); }
+  .kpi-table td { padding: 7px 6px; vertical-align: middle; }
+  .kpi-table td:first-child { font-weight: 600; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 10.5px;
+    font-weight: 700;
+  }
+  .badge-green { background: #E6FAF5; color: #00936B; }
+  .badge-yellow { background: #FFF8E1; color: #C97A00; }
+  .badge-red { background: #FDECEA; color: #C62828; }
+
+  /* ── ROADMAP ── */
+  .roadmap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .rm-phase {
+    border-radius: 12px;
+    padding: 12px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rm-phase::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    opacity: .12;
+  }
+  .rm-1 { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); }
+  .rm-1::before { background: #2E7D32; }
+  .rm-2 { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); }
+  .rm-2::before { background: #1565C0; }
+  .rm-3 { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); }
+  .rm-3::before { background: #E65100; }
+  .rm-tag { font-size: 10px; font-weight: 700; margin-bottom: 6px; opacity: .7; }
+  .rm-title { font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+  .rm-items { font-size: 11px; opacity: .75; line-height: 1.7; }
+  .rm-target {
+    margin-top: 8px;
+    padding: 4px 8px;
+    background: rgba(0,0,0,.08);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* ── DEMOGRAPHICS ── */
+  .demo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .demo-item { display: flex; flex-direction: column; }
+  .demo-label { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+  .demo-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .demo-pct { font-size: 12px; font-weight: 700; min-width: 38px; }
+
+  /* ── CHART CONTAINERS ── */
+  .chart-wrap { position: relative; height: 160px; }
+  .chart-wrap-sm { position: relative; height: 140px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--navy);
+    color: rgba(255,255,255,.4);
+    text-align: center;
+    padding: 10px;
+    font-size: 11px;
+  }
+  .footer strong { color: var(--teal); }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div>
+      <h1>📊 تقرير رأي الزوار – معرض دمشق الدولي</h1>
+      <div class="hero-sub">الدورة 63 &nbsp;·&nbsp; استبيان شارك فيه 300 مواطن من مختلف الفئات &nbsp;·&nbsp; وزارة الشؤون الاجتماعية والعمل</div>
+    </div>
+    <div class="hero-badge">🗓 الدورة 63</div>
+  </div>
+  <div class="kpi-strip">
+    <div class="kpi-card teal">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-num">300</div>
+      <div class="kpi-label">إجمالي المشاركين</div>
+    </div>
+    <div class="kpi-card gold">
+      <div class="kpi-icon">⭐</div>
+      <div class="kpi-num">3.48<span>/5</span></div>
+      <div class="kpi-label">متوسط تقييم الخدمات</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-icon">🎯</div>
+      <div class="kpi-num">95.3<span>%</span></div>
+      <div class="kpi-label">وعي بمهام الوزارة</div>
+    </div>
+    <div class="kpi-card rose">
+      <div class="kpi-icon">💼</div>
+      <div class="kpi-num">74<span>%</span></div>
+      <div class="kpi-label">يُولون التوظيف أولوية</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="body-grid">
+
+  <!-- أولويات المواطنين -->
+  <div class="panel span1">
+    <div class="panel-title">
+      <div class="dot" style="background:var(--teal)"></div>
+      🏆 أولويات المواطنين
+    </div>
+    <div class="priority-list">
+      <div class="priority-item">
+        <div class="priority-head">
+          <span class="priority-label">💼 توفير فرص العمل</span>
+          <span class="priority-pct" style="color:var(--teal)">74%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:74%;background:var(--teal)"></div></div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-head">
+          <span class="priority-label">♿ دعم ذوي الإعاقة</span>
+          <span class="priority-pct" style="color:var(--blue)">54.7%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:54.7%;background:var(--blue)"></div></div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-head">
+          <span class="priority-label">🎓 التدريب المهني</span>
+          <span class="priority-pct" style="color:var(--gold)">39.3%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:39.3%;background:var(--gold)"></div></div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-head">
+          <span class="priority-label">🛡 الحماية الاجتماعية</span>
+          <span class="priority-pct" style="color:#8E24AA">34.7%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:34.7%;background:#8E24AA"></div></div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-head">
+          <span class="priority-label">👴 رعاية كبار السن</span>
+          <span class="priority-pct" style="color:#E53935">34.7%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:34.7%;background:#E53935"></div></div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-head">
+          <span class="priority-label">🔧 تحسين الخدمات</span>
+          <span class="priority-pct" style="color:#00897B">31.3%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:31.3%;background:#00897B"></div></div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-head">
+          <span class="priority-label">📢 التواصل والإعلام</span>
+          <span class="priority-pct" style="color:var(--muted)">16.7%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:16.7%;background:var(--muted)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- تقييم الخدمات -->
+  <div class="panel span1">
+    <div class="panel-title">
+      <div class="dot" style="background:var(--gold)"></div>
+      ⭐ تقييم جودة الخدمات
+    </div>
+    <div class="chart-wrap">
+      <canvas id="servicesChart"></canvas>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;font-size:10.5px;">
+      <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#00C9A7;display:inline-block"></span>ممتاز 16%</span>
+      <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#1E88E5;display:inline-block"></span>جيد 33.3%</span>
+      <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#F7B731;display:inline-block"></span>متوسط 37.3%</span>
+      <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#FC5C7D;display:inline-block"></span>ضعيف 13.3%</span>
+    </div>
+  </div>
+
+  <!-- التوزيع الجنساني والعمري -->
+  <div class="panel span1">
+    <div class="panel-title">
+      <div class="dot" style="background:#8E24AA"></div>
+      👤 التوزيع الديموغرافي
+    </div>
+    <div class="chart-wrap-sm">
+      <canvas id="ageChart"></canvas>
+    </div>
+    <div style="margin-top:10px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600">الجنس</div>
+      <div class="demo-row">
+        <div class="demo-item">
+          <div class="demo-label">👨 ذكور</div>
+          <div class="demo-bar-wrap">
+            <div class="bar-track" style="flex:1"><div class="bar-fill" style="width:52%;background:#1E88E5"></div></div>
+            <div class="demo-pct" style="color:#1E88E5">52%</div>
+          </div>
+        </div>
+        <div class="demo-item">
+          <div class="demo-label">👩 إناث</div>
+          <div class="demo-bar-wrap">
+            <div class="bar-track" style="flex:1"><div class="bar-fill" style="width:48%;background:#FC5C7D"></div></div>
+            <div class="demo-pct" style="color:#FC5C7D">48%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- مؤشرات KPI -->
+  <div class="panel span2">
+    <div class="panel-title">
+      <div class="dot" style="background:var(--rose)"></div>
+      📈 مؤشرات الأداء الرئيسية (KPIs)
+    </div>
+    <table class="kpi-table">
+      <thead>
+        <tr>
+          <th>المؤشر</th>
+          <th style="text-align:center">القيمة</th>
+          <th style="text-align:center">التقييم</th>
+          <th>التوجه</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>⭐ متوسط تقييم الخدمات</td>
+          <td style="text-align:center;font-weight:700;color:var(--gold)">3.48 / 5</td>
+          <td style="text-align:center"><span class="badge badge-yellow">⚠ يحتاج تحسين</span></td>
+          <td>↗ إيجابي</td>
+        </tr>
+        <tr>
+          <td>😊 نسبة الرضا الإجمالية</td>
+          <td style="text-align:center;font-weight:700;color:var(--teal)">49.3%</td>
+          <td style="text-align:center"><span class="badge badge-yellow">⚠ متوسط</span></td>
+          <td>→ يحتاج دفعاً</td>
+        </tr>
+        <tr>
+          <td>🧠 معدل الوعي بمهام الوزارة</td>
+          <td style="text-align:center;font-weight:700;color:#00897B">95.3%</td>
+          <td style="text-align:center"><span class="badge badge-green">✅ ممتاز</span></td>
+          <td>✓ مستقر</td>
+        </tr>
+        <tr>
+          <td>📱 متابعة التواصل الاجتماعي</td>
+          <td style="text-align:center;font-weight:700;color:#00897B">66%</td>
+          <td style="text-align:center"><span class="badge badge-green">✅ مرتفع</span></td>
+          <td>↗ جيد</td>
+        </tr>
+        <tr>
+          <td>💼 الرضا عن جهود التوظيف</td>
+          <td style="text-align:center;font-weight:700;color:var(--rose)">35.3%</td>
+          <td style="text-align:center"><span class="badge badge-red">🚨 منخفض</span></td>
+          <td>↘ يستوجب تدخلاً</td>
+        </tr>
+        <tr>
+          <td>🛡 إدراك حماية الفئات الضعيفة</td>
+          <td style="text-align:center;font-weight:700;color:var(--gold)">64%</td>
+          <td style="text-align:center"><span class="badge badge-yellow">⚠ قابل للتحسين</span></td>
+          <td>→ يحتاج دفعاً</td>
+        </tr>
+        <tr>
+          <td>📣 رضا عن التواصل المؤسسي</td>
+          <td style="text-align:center;font-weight:700;color:var(--rose)">22%</td>
+          <td style="text-align:center"><span class="badge badge-red">🚨 أولوية عاجلة</span></td>
+          <td>↘ فجوة كبيرة</td>
+        </tr>
+        <tr>
+          <td>❓ نسبة عدم المعرفة بالوزارة</td>
+          <td style="text-align:center;font-weight:700;color:var(--rose)">4%</td>
+          <td style="text-align:center"><span class="badge badge-red">⚠ يستوجب معالجة</span></td>
+          <td>⚠ مقلق</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- التواصل والتوظيف دونت -->
+  <div class="panel span1">
+    <div class="panel-title">
+      <div class="dot" style="background:var(--blue)"></div>
+      📣 التواصل والتوظيف
+    </div>
+    <div class="chart-wrap-sm">
+      <canvas id="commsChart"></canvas>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--muted);text-align:center">
+      🔴 75.7% يرون التواصل غير كافٍ &nbsp;|&nbsp; 🟡 35.3% راضون عن التوظيف
+    </div>
+  </div>
+
+  <!-- خارطة الطريق -->
+  <div class="panel span3" style="padding-bottom:14px">
+    <div class="panel-title">
+      <div class="dot" style="background:var(--gold)"></div>
+      🗺 خارطة الطريق المقترحة
+    </div>
+    <div class="roadmap">
+      <div class="rm-phase rm-1">
+        <div class="rm-tag">🟢 المرحلة الأولى</div>
+        <div class="rm-title">⚡ الاستجابة الفورية</div>
+        <div style="font-size:11px;color:#1B5E20;font-weight:600;margin-bottom:4px">الأشهر 1–3</div>
+        <div class="rm-items">
+          📲 إطلاق منصة التواصل الرقمي<br>
+          🔧 تبسيط إجراءات الخدمة<br>
+          📋 إعلان خطة التوظيف الوطنية
+        </div>
+        <div class="rm-target">🎯 رفع مؤشر التواصل: 22% ← 40%</div>
+      </div>
+      <div class="rm-phase rm-2">
+        <div class="rm-tag">🔵 المرحلة الثانية</div>
+        <div class="rm-title">🏗 البناء المؤسسي</div>
+        <div style="font-size:11px;color:#0D47A1;font-weight:600;margin-bottom:4px">الأشهر 3–12</div>
+        <div class="rm-items">
+          👨‍🏫 تدريب الكوادر البشرية<br>
+          ♿ تفعيل برامج ذوي الإعاقة<br>
+          🤝 شراكات مع القطاع الخاص
+        </div>
+        <div class="rm-target">🎯 رفع متوسط التقييم: 3.48 ← 4.0</div>
+      </div>
+      <div class="rm-phase rm-3">
+        <div class="rm-tag">🟠 المرحلة الثالثة</div>
+        <div class="rm-title">🚀 الاستدامة والتوسع</div>
+        <div style="font-size:11px;color:#BF360C;font-weight:600;margin-bottom:4px">السنة الثانية</div>
+        <div class="rm-items">
+          📊 برامج التوظيف الشامل<br>
+          🗺 التوسع الجغرافي للخدمات<br>
+          📐 قياس الأثر الاجتماعي
+        </div>
+        <div class="rm-target">🎯 رفع مؤشر الرضا الإجمالي إلى 75%</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  صوت المواطن أمانة في أعناقنا &nbsp;·&nbsp; هذا التقرير خارطة طريق نحو وزارة أكثر فاعلية وأقرب إلى المواطن &nbsp;·&nbsp; <strong>معرض دمشق الدولي – الدورة 63</strong>
+</div>
+
+<script>
+Chart.defaults.font.family = "'Cairo', sans-serif";
+Chart.defaults.font.size = 11;
+
+// تقييم الخدمات - Bar Chart
+const servCtx = document.getElementById('servicesChart').getContext('2d');
+new Chart(servCtx, {
+  type: 'bar',
+  data: {
+    labels: ['ممتاز ⭐⭐⭐⭐⭐', 'جيد ⭐⭐⭐⭐', 'متوسط ⭐⭐⭐', 'ضعيف ⭐⭐', 'ضعيف جداً ⭐'],
+    datasets: [{
+      data: [48, 100, 112, 28, 12],
+      backgroundColor: ['#00C9A7','#1E88E5','#F7B731','#FC5C7D','#C62828'],
+      borderRadius: 8,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => ` ${ctx.raw} مشارك (${((ctx.raw/300)*100).toFixed(1)}%)` }
+    }},
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#6B7A99', font: { size: 10 } } },
+      y: { grid: { color: '#E2EAF8' }, ticks: { color: '#6B7A99', font: { size: 10 } }, max: 130 }
+    }
+  }
+});
+
+// التوزيع العمري - Horizontal Bar
+const ageCtx = document.getElementById('ageChart').getContext('2d');
+new Chart(ageCtx, {
+  type: 'bar',
+  data: {
+    labels: ['25–34 🟢','35–44 🔵','18–24 🟡','45–54 🟠','55+ 🟤','< 18 ⚪'],
+    datasets: [{
+      data: [38, 26, 16, 13.3, 5.3, 1.3],
+      backgroundColor: ['#00C9A7','#1E88E5','#F7B731','#8E24AA','#E53935','#90A4AE'],
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => ` ${ctx.raw}%` }
+    }},
+    scales: {
+      x: { grid: { color: '#E2EAF8' }, ticks: { color: '#6B7A99', font: { size: 10 }, callback: v => v+'%' }, max: 45 },
+      y: { grid: { display: false }, ticks: { color: '#1A2340', font: { size: 10 } } }
+    }
+  }
+});
+
+// التواصل - Doughnut
+const commsCtx = document.getElementById('commsChart').getContext('2d');
+new Chart(commsCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['إلى حد ما', 'لا – غير كافٍ', 'نعم – كافٍ', 'لا أعرف'],
+    datasets: [{
+      data: [51.3, 24.7, 22, 2],
+      backgroundColor: ['#F7B731','#FC5C7D','#00C9A7','#B0BEC5'],
+      borderWidth: 2, borderColor: '#fff',
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '62%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { padding: 8, font: { size: 10 }, color: '#1A2340', boxWidth: 10, boxHeight: 10 }
+      },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.raw}%` } }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
