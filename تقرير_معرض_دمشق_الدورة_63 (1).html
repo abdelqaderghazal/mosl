@@ -829,16 +829,26 @@ async function exportToImage() {
   try {
     // Hide export buttons so they don't appear in the image
     document.querySelectorAll('.export-btn').forEach(b => b.style.display = 'none');
-    await new Promise(r => setTimeout(r, 50));
+
+    // html2canvas does not support CSS filter — temporarily remove it from the logo
+    const logo = document.querySelector('.hero img');
+    const savedFilter = logo ? logo.style.filter : '';
+    if (logo) logo.style.filter = 'none';
+
+    await new Promise(r => setTimeout(r, 80));
 
     const target = document.querySelector('body');
     const canvas = await html2canvas(target, {
       scale: 2,
       useCORS: true,
+      allowTaint: true,
       backgroundColor: '#F0F4FF',
       windowWidth: document.documentElement.scrollWidth,
       windowHeight: document.documentElement.scrollHeight
     });
+
+    // Restore filter after capture
+    if (logo) logo.style.filter = savedFilter;
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
     a.download = 'تقرير_رأي_الزوار_معرض_دمشق_الدورة_63.png';
